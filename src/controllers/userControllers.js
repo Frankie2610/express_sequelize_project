@@ -1,3 +1,4 @@
+import { log } from "console";
 import sequelize from "../models/connect.js";
 import initModels from "../models/init-models.js"
 
@@ -19,6 +20,10 @@ const getLikedUserList = async (req, res) => {
             }
 
         })
+        if (!data) {
+            res.status(404).send("The user does not exist!")
+            return
+        }
         res.send(data);
     } catch (error) {
         res.send(`BE error: ${error}`)
@@ -41,6 +46,10 @@ const getRatedUserList = async (req, res) => {
                 user_id: userId
             }
         })
+        if (!data) {
+            res.status(404).send("The user does not exist!")
+            return
+        }
         res.send(data)
     } catch (error) {
         res.send(`BE error: ${error}`)
@@ -64,9 +73,9 @@ const createLike = async (req, res) => {
                 date_like: new Date()
             }
             await conn.like_res.create(newLike);
-            res.send("Your like has recorded successfully")
+            res.status(201).send("Your like has recorded successfully!")
         } else {
-            res.send("You have already like this restaurant!")
+            res.status(400).send("You have already like this restaurant!")
         }
 
     } catch (error) {
@@ -94,9 +103,9 @@ const deleteLike = async (req, res) => {
                     }
                 }
             )
-            res.send("Your like has deleted successfully")
+            res.send("Your like has deleted successfully!")
         } else {
-            res.send("You have already unliked this restaurant!")
+            res.status(400).send("You have already unliked this restaurant!")
         }
     } catch (error) {
         res.send(`BE error: ${error}`)
@@ -107,6 +116,10 @@ const deleteLike = async (req, res) => {
 const createRate = async (req, res) => {
     let { userId, resId } = req.params
     let { amount } = req.body
+    if (amount <= 0 || !amount) {
+        res.status(400).send("You haven't entered the amount of this rate!!")
+        return
+    }
     try {
         let data = await conn.rate_res.findOne({
             where: {
@@ -122,9 +135,9 @@ const createRate = async (req, res) => {
                 date_rate: new Date()
             }
             await conn.rate_res.create(newRate);
-            res.send("Your rate has recorded successfully")
+            res.status(201).send("Your rate has recorded successfully!")
         } else {
-            res.send("Sorry, you have already rated this restaurant")
+            res.status(400).send("Sorry, you have already rated this restaurant!")
         }
 
     } catch (error) {
@@ -136,8 +149,8 @@ const createRate = async (req, res) => {
 const orderFood = async (req, res) => {
     let { userId, foodId } = req.params
     let { amount } = req.body
-    if (amount <= 0) {
-        res.send("You haven't entered the amount of this order!!")
+    if (amount <= 0 || !amount) {
+        res.status(400).send("You haven't entered the amount of this order!!")
         return
     }
     try {
@@ -149,7 +162,7 @@ const orderFood = async (req, res) => {
             arr_sub_id: "ASID" + (Math.floor(Math.random() * 20) + 1).toString().padStart(3, '0')
         }
         await conn.order_food.create(newOrder)
-        res.send("Your order is preparing!")
+        res.status(201).send("Your order is preparing!")
     } catch (error) {
         res.send(`BE error: ${error}`)
     }

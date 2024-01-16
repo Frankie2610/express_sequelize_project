@@ -18,6 +18,10 @@ const getLikedResList = async (req, res) => {
                 res_id: restaurantId
             }
         })
+        if (!data) {
+            res.status(404).send("The restaurant does not exist!")
+            return
+        }
         res.send(data);
     } catch (error) {
         res.send(`BE error: ${error}`)
@@ -26,7 +30,7 @@ const getLikedResList = async (req, res) => {
 }
 
 // API rateList based on restaurant
-const getRatedResList = async (rep, res) => {
+const getRatedResList = async (req, res) => {
     let { restaurantId } = req.params;
     try {
         let data = await conn.restaurant.findOne({
@@ -40,6 +44,10 @@ const getRatedResList = async (rep, res) => {
                 res_id: restaurantId
             }
         })
+        if (!data) {
+            res.status(404).send("The restaurant does not exist!")
+            return
+        }
         res.send(data)
     } catch (error) {
         res.send(`BE error: ${error}`)
